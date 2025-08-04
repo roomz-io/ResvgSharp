@@ -104,3 +104,8 @@ var options = new ResvgOptions
 | `ExportAreaPage` | `bool` | `false` | Export page area |
 | `ExportAreaDrawing` | `bool` | `true` | Export drawing area |
 | `ResourcesDir` | `string?` | `null` | Resources directory path |
+| `SerifFamily`       | `string?`   | `null`  | Sets the 'serif' font family      |
+| `SansSerifFamily`   | `string?`   | `null`  | Sets the 'sans-serif' font family |
+| `CursiveFamily`     | `string?`   | `null`  | Sets the 'cursive' font family    |
+| `FantasyFamily`     | `string?`   | `null`  | Sets the 'fantasy' font family    |
+| `MonospaceFamily`   | `string?`   | `null`  | Sets the 'monospace' font family  |

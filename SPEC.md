@@ -101,6 +101,31 @@ public class ResvgOptions
     /// Directory used for resolving relative paths in the SVG.
     /// </summary>
     public string? ResourcesDir { get; set; }
+    
+    /// <summary>
+    /// Sets the 'serif' font family.
+    /// </summary>
+    public string? SerifFamily { get; set; }
+
+    /// <summary>
+    /// Sets the 'sans-serif' font family.
+    /// </summary>
+    public string? SansSerifFamily { get; set; }
+
+    /// <summary>
+    /// Sets the 'cursive' font family.
+    /// </summary>
+    public string? CursiveFamily { get; set; }
+
+    /// <summary>
+    /// Sets the 'fantasy' font family.
+    /// </summary>
+    public string? FantasyFamily { get; set; }
+    
+    /// <summary>
+    /// Sets the 'monospace' font family.
+    /// </summary>
+    public string? MonospaceFamily { get; set; }
 }
 ```
 
@@ -124,6 +149,11 @@ pub struct RenderOptions {
     pub font_count: usize,             // number of fonts
     pub font_file: *const c_char,      // null for unset
     pub font_dir: *const c_char,       // null for unset
+    pub serif_family: *const c_char,        // null for unset
+    pub sans_serif_family: *const c_char,   // null for unset
+    pub cursive_family: *const c_char,      // null for unset
+    pub fantasy_family: *const c_char,      // null for unset
+    pub monospace_family: *const c_char,    // null for unset
 }
 
 #[no_mangle]

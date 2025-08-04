@@ -27,4 +27,14 @@ public class ResvgOptions
     public bool ExportAreaDrawing { get; set; } = true;
     
     public string? ResourcesDir { get; set; }
+
+    public string? SerifFamily { get; set; }
+
+    public string? SansSerifFamily { get; set; }
+
+    public string? CursiveFamily { get; set; }
+
+    public string? FantasyFamily { get; set; }
+    
+    public string? MonospaceFamily { get; set; }
 }

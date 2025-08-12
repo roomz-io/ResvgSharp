@@ -4,16 +4,16 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Authors>Ivy Interactive</Authors>
+    <Authors>Ivy Interactive,Roomz</Authors>
     <Company>ResvgSharp</Company>
     <Copyright>Copyright © Ivy Interactive</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Ivy-Interactive/ResvgSharp</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Ivy-Interactive/ResvgSharp</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <Version>1.0.3</Version>
-    <PackageId>ResvgSharp</PackageId>
-    <Title>ResvgSharp</Title>
+    <!--<PackageProjectUrl>https://github.com/Ivy-Interactive/ResvgSharp</PackageProjectUrl>-->
+    <!--<RepositoryUrl>https://github.com/Ivy-Interactive/ResvgSharp</RepositoryUrl>-->
+    <!--<RepositoryType>git</RepositoryType>-->
+    <Version>1.0.4</Version>
+    <PackageId>Roomz.ResvgSharp</PackageId>
+    <Title>Roomz.ResvgSharp</Title>
     <PackageDescription>Cross-platform .NET wrapper for the high-performance resvg SVG rendering library. Render SVG strings to PNG images with full support for custom fonts.</PackageDescription>
     <PackageTags>svg;rendering;resvg;graphics;png;vector</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

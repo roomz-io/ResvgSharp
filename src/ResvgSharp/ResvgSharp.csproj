@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageId>Roomz.ResvgSharp</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,9 +8,8 @@
     <Company>ResvgSharp</Company>
     <Copyright>Copyright © Ivy Interactive</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <!--<PackageProjectUrl>https://github.com/Ivy-Interactive/ResvgSharp</PackageProjectUrl>-->
-    <!--<RepositoryUrl>https://github.com/Ivy-Interactive/ResvgSharp</RepositoryUrl>-->
-    <!--<RepositoryType>git</RepositoryType>-->
+    <PackageProjectUrl>https://github.com/Ivy-Interactive/ResvgSharp</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
     <Version>1.0.4</Version>
     <PackageId>Roomz.ResvgSharp</PackageId>
     <Title>Roomz.ResvgSharp</Title>

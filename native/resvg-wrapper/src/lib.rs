@@ -22,6 +22,11 @@ pub struct RenderOptions {
     pub font_count: usize,
     pub font_file: *const c_char,
     pub font_dir: *const c_char,
+    pub serif_family: *const c_char,
+    pub sans_serif_family: *const c_char,
+    pub cursive_family: *const c_char,
+    pub fantasy_family: *const c_char,
+    pub monospace_family: *const c_char,
 }
 
 unsafe fn c_str_to_string(ptr: *const c_char) -> Option<String> {
@@ -74,7 +79,27 @@ pub extern "C" fn render_svg_to_png_with_options(
         if let Some(font_dir) = c_str_to_string(opts.font_dir) {
             fontdb.load_fonts_dir(&font_dir);
         }
-        
+
+        if let Some(serif_family) = c_str_to_string(opts.serif_family) {
+            fontdb.set_serif_family(&serif_family);
+        }
+
+        if let Some(sans_serif_family) = c_str_to_string(opts.sans_serif_family) {
+            fontdb.set_sans_serif_family(&sans_serif_family);
+        }
+
+        if let Some(cursive_family) = c_str_to_string(opts.cursive_family) {
+            fontdb.set_cursive_family(&cursive_family);
+        }
+
+        if let Some(fantasy_family) = c_str_to_string(opts.fantasy_family) {
+            fontdb.set_fantasy_family(&fantasy_family);
+        }
+
+        if let Some(monospace_family) = c_str_to_string(opts.monospace_family) {
+            fontdb.set_monospace_family(&monospace_family);
+        }
+
         let mut usvg_opts = Options::default();
         usvg_opts.fontdb = std::sync::Arc::new(fontdb);
         

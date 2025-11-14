@@ -30,6 +30,11 @@ public static class Resvg
         public UIntPtr font_count;
         public IntPtr font_file;
         public IntPtr font_dir;
+        public IntPtr serif_family;
+        public IntPtr sans_serif_family;
+        public IntPtr cursive_family;
+        public IntPtr fantasy_family;
+        public IntPtr monospace_family;
     }
 
     [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
@@ -68,7 +73,12 @@ public static class Resvg
             font_lens = IntPtr.Zero,
             font_count = UIntPtr.Zero,
             font_file = IntPtr.Zero,
-            font_dir = IntPtr.Zero
+            font_dir = IntPtr.Zero,
+            serif_family = IntPtr.Zero,
+            sans_serif_family = IntPtr.Zero,
+            cursive_family = IntPtr.Zero,
+            fantasy_family = IntPtr.Zero,
+            monospace_family = IntPtr.Zero,
         };
 
         IntPtr backgroundPtr = IntPtr.Zero;
@@ -79,6 +89,11 @@ public static class Resvg
         IntPtr[] fontPtrs = Array.Empty<IntPtr>();
         IntPtr fontArrayPtr = IntPtr.Zero;
         IntPtr fontLensPtr = IntPtr.Zero;
+        IntPtr serifFamilyPtr = IntPtr.Zero;
+        IntPtr sansSerifFamilyPtr = IntPtr.Zero;
+        IntPtr cursiveFamilyPtr = IntPtr.Zero;
+        IntPtr fantasyFamilyPtr = IntPtr.Zero;
+        IntPtr monospaceFamilyPtr = IntPtr.Zero;
 
         try
         {
@@ -120,6 +135,46 @@ public static class Resvg
                 fontDirPtr = Marshal.AllocHGlobal(fontDirBytes.Length);
                 Marshal.Copy(fontDirBytes, 0, fontDirPtr, fontDirBytes.Length);
                 nativeOptions.font_dir = fontDirPtr;
+            }
+
+            if (!string.IsNullOrEmpty(options.SerifFamily))
+            {
+                var serifFamilyBytes = System.Text.Encoding.UTF8.GetBytes(options.SerifFamily + "\0");
+                serifFamilyPtr = Marshal.AllocHGlobal(serifFamilyBytes.Length);
+                Marshal.Copy(serifFamilyBytes, 0, serifFamilyPtr, serifFamilyBytes.Length);
+                nativeOptions.serif_family = fontDirPtr;
+            }
+
+            if (!string.IsNullOrEmpty(options.SansSerifFamily))
+            {
+                var sansSerifFamilyBytes = System.Text.Encoding.UTF8.GetBytes(options.SansSerifFamily + "\0");
+                sansSerifFamilyPtr = Marshal.AllocHGlobal(sansSerifFamilyBytes.Length);
+                Marshal.Copy(sansSerifFamilyBytes, 0, sansSerifFamilyPtr, sansSerifFamilyBytes.Length);
+                nativeOptions.sans_serif_family = sansSerifFamilyPtr;
+            }
+
+            if (!string.IsNullOrEmpty(options.CursiveFamily))
+            {
+                var cursiveFamilyBytes = System.Text.Encoding.UTF8.GetBytes(options.CursiveFamily + "\0");
+                cursiveFamilyPtr = Marshal.AllocHGlobal(cursiveFamilyBytes.Length);
+                Marshal.Copy(cursiveFamilyBytes, 0, cursiveFamilyPtr, cursiveFamilyBytes.Length);
+                nativeOptions.cursive_family = cursiveFamilyPtr;
+            }
+
+            if (!string.IsNullOrEmpty(options.FantasyFamily))
+            {
+                var fantasyFamilyBytes = System.Text.Encoding.UTF8.GetBytes(options.FantasyFamily + "\0");
+                fantasyFamilyPtr = Marshal.AllocHGlobal(fantasyFamilyBytes.Length);
+                Marshal.Copy(fantasyFamilyBytes, 0, fantasyFamilyPtr, fantasyFamilyBytes.Length);
+                nativeOptions.fantasy_family = fantasyFamilyPtr;
+            }
+
+            if (!string.IsNullOrEmpty(options.MonospaceFamily))
+            {
+                var monospaceFamilyBytes = System.Text.Encoding.UTF8.GetBytes(options.MonospaceFamily + "\0");
+                monospaceFamilyPtr = Marshal.AllocHGlobal(monospaceFamilyBytes.Length);
+                Marshal.Copy(monospaceFamilyBytes, 0, monospaceFamilyPtr, monospaceFamilyBytes.Length);
+                nativeOptions.monospace_family = monospaceFamilyPtr;
             }
 
             if (options.UseFonts != null && options.UseFonts.Length > 0)
@@ -197,6 +252,11 @@ public static class Resvg
             if (resourcesDirPtr != IntPtr.Zero) Marshal.FreeHGlobal(resourcesDirPtr);
             if (fontFilePtr != IntPtr.Zero) Marshal.FreeHGlobal(fontFilePtr);
             if (fontDirPtr != IntPtr.Zero) Marshal.FreeHGlobal(fontDirPtr);
+            if (serifFamilyPtr != IntPtr.Zero) Marshal.FreeHGlobal(serifFamilyPtr);
+            if (sansSerifFamilyPtr != IntPtr.Zero) Marshal.FreeHGlobal(sansSerifFamilyPtr);
+            if (cursiveFamilyPtr != IntPtr.Zero) Marshal.FreeHGlobal(cursiveFamilyPtr);
+            if (fantasyFamilyPtr != IntPtr.Zero) Marshal.FreeHGlobal(fantasyFamilyPtr);
+            if (monospaceFamilyPtr != IntPtr.Zero) Marshal.FreeHGlobal(monospaceFamilyPtr);
 
             foreach (var ptr in fontPtrs)
             {

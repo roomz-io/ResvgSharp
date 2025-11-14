@@ -4,16 +4,17 @@ on:
   workflow_dispatch:
   release:
     types: [published]
+  pull_request:
 
 env:
   CARGO_TERM_COLOR: always
-  DOTNET_VERSION: "9.0.x"
+  DOTNET_VERSION: '9.0.x'
 
 jobs:
   build-native:
     permissions:
       packages: write
-
+    
     strategy:
       matrix:
         include:
@@ -40,151 +41,151 @@ jobs:
             artifact: libresvg_wrapper.dylib
 
     runs-on: ${{ matrix.os }}
-
+    
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.rust-target }}
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.rust-target }}
 
-      - name: Install cross-compilation tools
-        if: matrix.use-cross == true
-        run: |
-          cargo install cross --git https://github.com/cross-rs/cross
+    - name: Install cross-compilation tools
+      if: matrix.use-cross == true
+      run: |
+        cargo install cross --git https://github.com/cross-rs/cross
 
-      - name: Build native library (cross)
-        if: matrix.use-cross == true
-        working-directory: native/resvg-wrapper
-        run: |
-          cross build --release --target ${{ matrix.rust-target }}
+    - name: Build native library (cross)
+      if: matrix.use-cross == true
+      working-directory: native/resvg-wrapper
+      run: |
+        cross build --release --target ${{ matrix.rust-target }}
 
-      - name: Build native library
-        if: matrix.use-cross != true
-        working-directory: native/resvg-wrapper
-        run: |
-          cargo build --release --target ${{ matrix.rust-target }}
+    - name: Build native library
+      if: matrix.use-cross != true
+      working-directory: native/resvg-wrapper
+      run: |
+        cargo build --release --target ${{ matrix.rust-target }}
 
-      - name: Create output directory
-        run: |
-          mkdir -p build/runtimes/${{ matrix.rid }}/native
+    - name: Create output directory
+      run: |
+        mkdir -p build/runtimes/${{ matrix.rid }}/native
 
-      - name: Copy native library (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          cp native/resvg-wrapper/target/${{ matrix.rust-target }}/release/${{ matrix.artifact }} build/runtimes/${{ matrix.rid }}/native/
+    - name: Copy native library (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        cp native/resvg-wrapper/target/${{ matrix.rust-target }}/release/${{ matrix.artifact }} build/runtimes/${{ matrix.rid }}/native/
 
-      - name: Copy native library (Unix)
-        if: runner.os != 'Windows'
-        run: |
-          cp native/resvg-wrapper/target/${{ matrix.rust-target }}/release/${{ matrix.artifact }} build/runtimes/${{ matrix.rid }}/native/
+    - name: Copy native library (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        cp native/resvg-wrapper/target/${{ matrix.rust-target }}/release/${{ matrix.artifact }} build/runtimes/${{ matrix.rid }}/native/
 
-      - name: Upload native artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: native-${{ matrix.rid }}
-          path: build/runtimes/${{ matrix.rid }}/native/*
+    - name: Upload native artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: native-${{ matrix.rid }}
+        path: build/runtimes/${{ matrix.rid }}/native/*
 
   build-dotnet:
     needs: build-native
     runs-on: ubuntu-latest
-
+    
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Download all native artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: native-*
-          path: build/temp/
+    - name: Download all native artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: native-*
+        path: build/temp/
 
-      - name: Fix artifact structure
-        run: |
-          mkdir -p build/runtimes
-          for artifact_dir in build/temp/native-*/; do
-            if [ -d "$artifact_dir" ]; then
-              # Extract RID from artifact name (e.g., native-linux-x64 -> linux-x64)
-              rid=$(basename "$artifact_dir" | sed 's/^native-//')
-              mkdir -p "build/runtimes/${rid}/native"
-              # Copy all files from the artifact directory
-              cp -r "$artifact_dir"/* "build/runtimes/${rid}/native/" 2>/dev/null || true
-            fi
-          done
-          # Clean up temp directory
-          rm -rf build/temp
-
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Debug artifacts structure
-        run: |
-          echo "=== Build directory structure ==="
-          find build -type f -name "*.so" -o -name "*.dll" -o -name "*.dylib" | head -20 || echo "No native libraries found"
-          echo ""
-          echo "=== Build/runtimes directory tree ==="
-          tree build/runtimes/ || ls -laR build/runtimes/
-          echo ""
-          echo "=== Test output directory before copy ==="
-          ls -la tests/ResvgSharp.Tests/bin/Release/net9.0/ 2>/dev/null || echo "Test output directory doesn't exist yet"
-
-      - name: Copy native libraries for testing
-        run: |
-          # Ensure test output directory exists
-          mkdir -p tests/ResvgSharp.Tests/bin/Release/net9.0/
-
-          # Copy Linux x64 native library to test output directory
-          if [ -f "build/runtimes/linux-x64/native/libresvg_wrapper.so" ]; then
-            echo "Copying libresvg_wrapper.so to test directory"
-            cp build/runtimes/linux-x64/native/libresvg_wrapper.so tests/ResvgSharp.Tests/bin/Release/net9.0/
-            # Also copy with alternative name that .NET might look for
-            cp build/runtimes/linux-x64/native/libresvg_wrapper.so tests/ResvgSharp.Tests/bin/Release/net9.0/resvg_wrapper.so
-          else
-            echo "ERROR: libresvg_wrapper.so not found at expected location"
-            exit 1
+    - name: Fix artifact structure
+      run: |
+        mkdir -p build/runtimes
+        for artifact_dir in build/temp/native-*/; do
+          if [ -d "$artifact_dir" ]; then
+            # Extract RID from artifact name (e.g., native-linux-x64 -> linux-x64)
+            rid=$(basename "$artifact_dir" | sed 's/^native-//')
+            mkdir -p "build/runtimes/${rid}/native"
+            # Copy all files from the artifact directory
+            cp -r "$artifact_dir"/* "build/runtimes/${rid}/native/" 2>/dev/null || true
           fi
+        done
+        # Clean up temp directory
+        rm -rf build/temp
 
-          # Verify the copy worked
-          echo "=== Test output directory after copy ==="
-          ls -la tests/ResvgSharp.Tests/bin/Release/net9.0/
+    - name: Restore dependencies
+      run: dotnet restore
 
-          # Check if the library can be read
-          echo "=== Library file info ==="
-          file tests/ResvgSharp.Tests/bin/Release/net9.0/libresvg_wrapper.so
-          ldd tests/ResvgSharp.Tests/bin/Release/net9.0/libresvg_wrapper.so || echo "ldd failed - checking dependencies..."
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal
+    - name: Debug artifacts structure
+      run: |
+        echo "=== Build directory structure ==="
+        find build -type f -name "*.so" -o -name "*.dll" -o -name "*.dylib" | head -20 || echo "No native libraries found"
+        echo ""
+        echo "=== Build/runtimes directory tree ==="
+        tree build/runtimes/ || ls -laR build/runtimes/
+        echo ""
+        echo "=== Test output directory before copy ==="
+        ls -la tests/ResvgSharp.Tests/bin/Release/net9.0/ 2>/dev/null || echo "Test output directory doesn't exist yet"
 
-      - name: Pack NuGet package
-        run: dotnet pack src/ResvgSharp/ResvgSharp.csproj --configuration Release --no-build --output nupkgs
+    - name: Copy native libraries for testing
+      run: |
+        # Ensure test output directory exists
+        mkdir -p tests/ResvgSharp.Tests/bin/Release/net9.0/
+        
+        # Copy Linux x64 native library to test output directory
+        if [ -f "build/runtimes/linux-x64/native/libresvg_wrapper.so" ]; then
+          echo "Copying libresvg_wrapper.so to test directory"
+          cp build/runtimes/linux-x64/native/libresvg_wrapper.so tests/ResvgSharp.Tests/bin/Release/net9.0/
+          # Also copy with alternative name that .NET might look for
+          cp build/runtimes/linux-x64/native/libresvg_wrapper.so tests/ResvgSharp.Tests/bin/Release/net9.0/resvg_wrapper.so
+        else
+          echo "ERROR: libresvg_wrapper.so not found at expected location"
+          exit 1
+        fi
+        
+        # Verify the copy worked
+        echo "=== Test output directory after copy ==="
+        ls -la tests/ResvgSharp.Tests/bin/Release/net9.0/
+        
+        # Check if the library can be read
+        echo "=== Library file info ==="
+        file tests/ResvgSharp.Tests/bin/Release/net9.0/libresvg_wrapper.so
+        ldd tests/ResvgSharp.Tests/bin/Release/net9.0/libresvg_wrapper.so || echo "ldd failed - checking dependencies..."
 
-      - name: Upload NuGet package
-        uses: actions/upload-artifact@v4
-        with:
-          name: nuget-package
-          path: nupkgs/*.nupkg
+    - name: Test
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Pack NuGet package
+      run: dotnet pack src/ResvgSharp/ResvgSharp.csproj --configuration Release --no-build --output nupkgs
+
+    - name: Upload NuGet package
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package
+        path: nupkgs/*.nupkg
 
   release:
     needs: build-dotnet
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-
+    
     steps:
-      - name: Download NuGet package
-        uses: actions/download-artifact@v4
-        with:
-          name: nuget-package
-          path: nupkgs
+    - name: Download NuGet package
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-package
+        path: nupkgs
 
-      - name: Push to NuGet.org
-        run: |
-          dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/roomz-io/index.json --skip-duplicate
+    - name: Push to NuGet.org
+      run: |
+        dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/roomz-io/index.json --skip-duplicate
